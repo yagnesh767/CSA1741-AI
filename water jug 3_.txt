@@ -1,0 +1,53 @@
+from collections import deque
+
+def water_jug_problem(X, Y, Z):
+    # Initial states for the jugs
+    start_state = (0, 0)
+    # Queue for BFS: (current state, steps taken)
+    queue = deque([(start_state, 0)])
+    # Visited states to avoid processing the same state multiple times
+    visited = set()
+    visited.add(start_state)
+
+    while queue:
+        (current_x, current_y), steps = queue.popleft()
+
+        # Check if we have reached the target amount Z
+        if current_x == Z or current_y == Z:
+            return steps
+
+        # Generate all possible next states from current state
+        next_states = []
+
+        # Fill jug X
+        next_states.append((X, current_y))
+        # Fill jug Y
+        next_states.append((current_x, Y))
+        # Empty jug X
+        next_states.append((0, current_y))
+        # Empty jug Y
+        next_states.append((current_x, 0))
+        # Pour from X to Y until Y is full or X is empty
+        next_states.append((current_x - min(current_x, Y - current_y), current_y + min(current_x, Y - current_y)))
+        # Pour from Y to X until X is full or Y is empty
+        next_states.append((current_x + min(current_y, X - current_x), current_y - min(current_y, X - current_x)))
+
+        # Process each next state
+        for state in next_states:
+            if state not in visited:
+                visited.add(state)
+                queue.append((state, steps + 1))
+
+    # If no solution found
+    return -1
+
+# Example usage:
+X = 3  # Capacity of jug X
+Y = 5  # Capacity of jug Y
+Z = 4  # Target amount to measure
+
+result = water_jug_problem(X, Y, Z)
+if result == -1:
+    print(f"No solution found for {X}-liter and {Y}-liter jugs to measure {Z} liters.")
+else:
+    print(f"Minimum steps required to measure {Z} liters using {X}-liter and {Y}-liter jugs: {result}")
